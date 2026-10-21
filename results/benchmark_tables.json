@@ -1,0 +1,111 @@
+{
+  "Table5_Main_Comparison": {
+    "S1 (Sentiment-Only)": {
+      "precision": 0.14758620689655172,
+      "recall": 1.0,
+      "f1": 0.25721153846153844,
+      "auc_roc": 0.3920848077911865,
+      "pr_auc": 0.19927820111478478
+    },
+    "S2 (TF-IDF + LR)": {
+      "precision": 0.9553571428571429,
+      "recall": 1.0,
+      "f1": 0.9771689497716894,
+      "auc_roc": 0.9997731603302786,
+      "pr_auc": 0.9987483311081442
+    },
+    "S3 (TF-IDF + RF)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "S4 (Behaviour Only)": {
+      "precision": 0.926829268292683,
+      "recall": 0.7102803738317757,
+      "f1": 0.8042328042328042,
+      "auc_roc": 0.9367495387593382,
+      "pr_auc": 0.8433827028649047
+    },
+    "S6 (Ling+Beh, RF)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "S7 (Ling+Beh, XGB Champion)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    }
+  },
+  "Bootstrap_95CI": {
+    "delta_f1_95ci": [
+      0.799485164517455,
+      0.8958994907425684
+    ],
+    "delta_auc_95ci": [
+      0.537078473068213,
+      0.671355579914309
+    ]
+  },
+  "Table6_Ablation": {
+    "Full Fused Model (S7)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "Drop TF-IDF": {
+      "precision": 1.0,
+      "recall": 0.9906542056074766,
+      "f1": 0.9953051643192489,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "Drop BERT PCA": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "Drop Stylometry": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "Drop Behavioral": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    }
+  },
+  "Table7_Leakage_Comparison": {
+    "Random Review-Level Split (Leakage)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 0.9999999999999999
+    },
+    "Reviewer-Disjoint Split (Honest)": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "auc_roc": 1.0,
+      "pr_auc": 1.0
+    },
+    "Leakage Delta F1": 0.0,
+    "Leakage Delta AUC": 0.0
+  }
+}
