@@ -19,9 +19,20 @@ import altair as alt
 import streamlit as st
 import joblib
 
-# Dynamically resolve root project directory
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+# Dynamically resolve root project directory containing artifacts
+def find_project_root():
+    search_dirs = [
+        os.getcwd(),
+        os.path.dirname(os.path.abspath(__file__)),
+        os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")),
+        os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")),
+    ]
+    for d in search_dirs:
+        if os.path.exists(os.path.join(d, "artifacts", "models")):
+            return d
+    return os.getcwd()
+
+BASE_DIR = find_project_root()
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
@@ -157,17 +168,40 @@ st.markdown(
 @st.cache_resource
 def load_system_artifacts():
     """Loads pre-trained models, feature pipeline, and calibrator."""
-    base_dir = BASE_DIR
-    model_path = os.path.join(base_dir, "artifacts/models/fused_xgboost_model.joblib")
-    scaler_path = os.path.join(base_dir, "artifacts/scalers/feature_pipeline.joblib")
-    calib_path = os.path.join(base_dir, "artifacts/calibrators/isotonic_calibrator.joblib")
-
-    if os.path.exists(model_path) and os.path.exists(scaler_path):
-        model = joblib.load(model_path)
-        pipeline = joblib.load(scaler_path)
-        calibrator = joblib.load(calib_path) if os.path.exists(calib_path) else IsotonicScoreCalibrator()
-        explainer = TreeSHAPExplainer(model, pipeline.feature_names)
-        return model, pipeline, calibrator, explainer
+    search_dirs = [
+        BASE_DIR,
+        os.getcwd(),
+        os.path.dirname(os.path.abspath(__file__)),
+        os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")),
+    ]
+    for b_dir in search_dirs:
+        scaler_path = os.path.join(b_dir, "artifacts/scalers/feature_pipeline.joblib")
+        calib_path = os.path.join(b_dir, "artifacts/calibrators/isotonic_calibrator.joblib")
+        
+        if not os.path.exists(scaler_path):
+            continue
+            
+        # Try XGBoost, fallback to Random Forest
+        model = None
+        for m_name in ["fused_xgboost_model.joblib", "fused_rf_model.joblib"]:
+            m_path = os.path.join(b_dir, "artifacts/models", m_name)
+            if os.path.exists(m_path):
+                try:
+                    model = joblib.load(m_path)
+                    break
+                except Exception as ex:
+                    print(f"Warning: Failed to load {m_name}: {ex}")
+                    
+        if model is not None:
+            try:
+                pipeline = joblib.load(scaler_path)
+                calibrator = joblib.load(calib_path) if os.path.exists(calib_path) else IsotonicScoreCalibrator()
+                explainer = TreeSHAPExplainer(model, pipeline.feature_names)
+                return model, pipeline, calibrator, explainer
+            except Exception as e:
+                st.error(f"Error initializing model pipeline from {b_dir}: {e}")
+                return None, None, None, None
+                
     return None, None, None, None
 
 
