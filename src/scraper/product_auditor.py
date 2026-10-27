@@ -39,11 +39,15 @@ def detect_synthetic_ai_leak(text: str) -> Optional[str]:
     return None
 
 
+# Resolve root directory dynamically
+DEFAULT_BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
+
 class ProductAuditor:
     """Audits live e-commerce product links, extracts reviews, and renders fraud verdicts."""
 
-    def __init__(self, base_dir: str = "/Users/sagar0908/Projects"):
-        self.base_dir = base_dir
+    def __init__(self, base_dir: Optional[str] = None):
+        self.base_dir = base_dir or DEFAULT_BASE_DIR
         self.parser = ReviewParser()
         self.sentiment_analyzer = RobustSentimentAnalyzer()
 

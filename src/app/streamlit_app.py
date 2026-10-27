@@ -9,6 +9,7 @@ Supports:
 """
 
 import os
+import sys
 import re
 import json
 from datetime import datetime, timedelta
@@ -17,6 +18,24 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 import joblib
+
+# Dynamically resolve root project directory
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+# Auto-download required NLTK data if missing
+import nltk
+for res, sub in [('punkt', 'tokenizers/punkt'), ('punkt_tab', 'tokenizers/punkt_tab'), 
+                 ('stopwords', 'corpora/stopwords'), ('vader_lexicon', 'corpora/vader_lexicon')]:
+    try:
+        nltk.data.find(sub)
+    except LookupError:
+        try:
+            nltk.download(res, quiet=True)
+        except Exception:
+            pass
 
 from src.features.fusion import FeaturePipeline
 from src.features.behavioral import RobustSentimentAnalyzer
@@ -138,7 +157,7 @@ st.markdown(
 @st.cache_resource
 def load_system_artifacts():
     """Loads pre-trained models, feature pipeline, and calibrator."""
-    base_dir = "/Users/sagar0908/Projects"
+    base_dir = BASE_DIR
     model_path = os.path.join(base_dir, "artifacts/models/fused_xgboost_model.joblib")
     scaler_path = os.path.join(base_dir, "artifacts/scalers/feature_pipeline.joblib")
     calib_path = os.path.join(base_dir, "artifacts/calibrators/isotonic_calibrator.joblib")
@@ -1048,7 +1067,7 @@ def main():
     # -------------------------------------------------------------
     with tab_benchmarks:
         st.subheader("Scientific Research Evaluation & Leakage Benchmarks")
-        benchmarks_path = "/Users/sagar0908/Projects/results/benchmark_tables.json"
+        benchmarks_path = os.path.join(BASE_DIR, "results/benchmark_tables.json")
 
         if os.path.exists(benchmarks_path):
             with open(benchmarks_path, "r") as f:
